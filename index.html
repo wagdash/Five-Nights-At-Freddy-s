@@ -14,7 +14,13 @@
             text-shadow: 2px 2px #000; animation: blink 0.5s infinite;
         }
 
-        /* Efeito de Blackout (Energia Zero) */
+        /* MECÂNICA 3: Alucinações IT'S ME */
+        #hallucination-overlay {
+            position: fixed; inset: 0; background: black; color: white;
+            display: none; justify-content: center; align-items: center;
+            font-size: 80px; font-weight: bold; z-index: 10001; pointer-events: none;
+        }
+
         #blackout-screen {
             position: fixed; inset: 0; background: black; z-index: 4500;
             display: none; justify-content: center; align-items: center;
@@ -129,6 +135,7 @@
 </head>
 <body>
     <div id="blackout-screen"></div>
+    <div id="hallucination-overlay">IT'S ME</div>
 
     <div id="foxy-alert">⚠ FOXY CORRENDO!</div>
     <div id="night5-boost">⚡ GERADOR DE RESERVA ATIVADO! ⚡</div>
@@ -211,7 +218,6 @@
     </div>
 
     <script>
-    // --- MOVIMENTAÇÃO DO ESCRITÓRIO ---
     document.addEventListener('mousemove', (e) => {
         if (!gameState.running || gameState.monitorOpen) return;
         const x = e.clientX / window.innerWidth;
@@ -231,7 +237,7 @@
         night: 1, time: 0, power: 100, usage: 1, running: false,
         monitorOpen: false, currCam: '1A', lDoor: false, rDoor: false,
         lLight: false, rLight: false, foxyStage: 0, canClaimBonus: false,
-        night5BoostUsed: false
+        night5BoostUsed: false, goldenFreddyChance: false
     };
 
     const animatronics = {
@@ -241,7 +247,6 @@
         'Foxy':   { pos: '1C', color: 'var(--foxy-col)' }
     };
 
-    // MODIFICAÇÃO: Bonnie mais rápido e Freddy sem travas (no aiLogic)
     const paths = {
         'Bonnie': ['1A', '5', '2A', '2B', 'DOOR_L'],
         'Chica':  ['1A', '1B', '7', '6', '4A', '4B', 'DOOR_R'],
@@ -316,7 +321,7 @@
         }, 3000);
     }
 
-    let powerTimer, gameTimer, aiTimer;
+    let powerTimer, gameTimer, aiTimer, hallucinationTimer;
     function startGameLoops() {
         clearInterval(gameTimer);
         gameTimer = setInterval(() => {
@@ -340,7 +345,7 @@
 
             gameState.power -= (gameState.usage * 0.12);
             document.getElementById('val-pwr').innerText = Math.floor(gameState.power);
-            if(gameState.power <= 0) triggerPowerOutage(); // CHAMA O SISTEMA DE BLACKOUT
+            if(gameState.power <= 0) triggerPowerOutage();
         }, 1000);
 
         clearInterval(aiTimer);
@@ -348,26 +353,27 @@
             if(!gameState.running) return;
             aiLogic();
         }, 4000);
+
+        // MECÂNICA 3: Loop de Alucinações (It's Me)
+        clearInterval(hallucinationTimer);
+        hallucinationTimer = setInterval(() => {
+            if(gameState.running && Math.random() < 0.02) {
+                const overlay = document.getElementById('hallucination-overlay');
+                overlay.style.display = 'flex';
+                setTimeout(() => { overlay.style.display = 'none'; }, 100);
+            }
+        }, 3000);
     }
 
-    // MECÂNICA DE FIM DE ENERGIA IGUAL AO ORIGINAL
     function triggerPowerOutage() {
         gameState.running = false;
-        
-        // 1. Forçar portas a abrirem
         if(gameState.lDoor) toggleDoor('left');
         if(gameState.rDoor) toggleDoor('right');
-        
-        // 2. Apagar luzes e fechar monitor
         gameState.lLight = false; gameState.rLight = false;
         document.getElementById('beam-l').className = 'light-beam';
         document.getElementById('beam-r').className = 'light-beam';
         setMonitor(false);
-        
-        // 3. Blackout total
         document.getElementById('blackout-screen').style.display = 'flex';
-        
-        // 4. Suspense antes do ataque
         setTimeout(() => {
             gameOver("FREDDY TE PEGOU NO ESCURO!");
         }, Math.random() * 6000 + 4000);
@@ -395,8 +401,11 @@
         if(checkAI(levels.bonnie)) moveStandard('Bonnie');
         if(checkAI(levels.chica)) moveStandard('Chica');
         
-        // FREDDY SEM TRAVA (REMOVIDO A CHECAGEM DE MONITOR)
-        if(checkAI(levels.freddy)) moveStandard('Freddy');
+        // MECÂNICA 2: Risada do Freddy ao se mover
+        if(checkAI(levels.freddy)) {
+            moveStandard('Freddy');
+            console.log("FREDDY RIU!");
+        }
 
         let isLookingAtFoxy = (gameState.monitorOpen && gameState.currCam === '1C');
         if (!isLookingAtFoxy) {
@@ -460,8 +469,7 @@
         } else {
             gameState.rLight = on;
             document.getElementById('beam-r').className = on ? 'light-beam on' : 'light-beam';
-            let showM = (animatronics.Chica.pos === 'DOOR_R' || animatronics.Freddy.pos === 'DOOR_R');
-            document.getElementById('monster-r').style.display = (on && showM) ? 'flex' : 'none';
+            document.getElementById('monster-r').style.display = (on && (animatronics.Chica.pos === 'DOOR_R' || animatronics.Freddy.pos === 'DOOR_R')) ? 'flex' : 'none';
             document.getElementById('btn-l-r').classList.toggle('active', on);
         }
         updateUsage();
@@ -471,6 +479,11 @@
         if(!gameState.running && open) return;
         gameState.monitorOpen = open;
         document.getElementById('camera-ui').style.display = open ? 'block' : 'none';
+        
+        // MECÂNICA 4: Cartaz Golden Freddy
+        if(open && gameState.currCam === '2B') {
+            gameState.goldenFreddyChance = (Math.random() < 0.1);
+        }
         updateUsage();
     }
 
@@ -479,6 +492,11 @@
         document.getElementById('cam-name').innerText = id + " - " + name;
         document.querySelectorAll('.map-node').forEach(n => n.classList.remove('active'));
         document.getElementById('m-'+id).classList.add('active');
+        
+        // MECÂNICA 4
+        if(id === '2B') gameState.goldenFreddyChance = (Math.random() < 0.1);
+        else gameState.goldenFreddyChance = false;
+
         updateCamView();
     }
 
@@ -486,7 +504,25 @@
         const view = document.getElementById('cam-content');
         const btn = document.getElementById('recharge-btn');
         view.innerHTML = '';
+        
+        // MECÂNICA 1: Som na Cozinha
+        if(gameState.currCam === '6') {
+            let kitchenMsg = document.createElement('div');
+            kitchenMsg.innerText = "PANELAS BATENDO... (Câmera 6)";
+            view.appendChild(kitchenMsg);
+        }
+
         btn.style.display = (gameState.currCam === '6' && gameState.canClaimBonus) ? 'block' : 'none';
+        
+        // MECÂNICA 4
+        if(gameState.currCam === '2B' && gameState.goldenFreddyChance) {
+            let golden = document.createElement('div');
+            golden.className = 'anim-block';
+            golden.style.backgroundColor = 'gold';
+            golden.innerText = 'GF';
+            view.appendChild(golden);
+        }
+
         for(let name in animatronics) {
             if(animatronics[name].pos === gameState.currCam) {
                 let div = document.createElement('div');
@@ -513,7 +549,6 @@
         document.getElementById('jumpscare-face').innerText = reason;
     }
 
-    // ATIVAÇÃO DAS VITÓRIAS INFINITAS (ULTIMATE)
     checkSave();
     </script>
 </body>
