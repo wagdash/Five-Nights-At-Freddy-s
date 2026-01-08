@@ -72,15 +72,15 @@
         }
         
         /* AJUSTE FINAL: Portas trazidas para a mesma posição horizontal dos painéis */
-        #panel-l { left: 28%; } 
-        #door-l { left: 28%; transform: translateY(-100%); } /* Alinhado com o Painel L */
-        #beam-l { left: 28%; }
-        #monster-l { left: 29%; color: var(--bonnie-col); }
+        #panel-l { left: 26%; } 
+        #door-l { left: 26%; transform: translateY(-100%); } /* Alinhado com o Painel L */
+        #beam-l { left: 26%; }
+        #monster-l { left: 27%; color: var(--bonnie-col); }
 
-        #panel-r { right: 28%; }
-        #door-r { right: 28%; transform: translateY(-100%); } /* Alinhado com o Painel R */
-        #beam-r { right: 28%; }
-        #monster-r { right: 29%; color: var(--chica-col); }
+        #panel-r { right: 26%; }
+        #door-r { right: 26%; transform: translateY(-100%); } /* Alinhado com o Painel R */
+        #beam-r { right: 26%; }
+        #monster-r { right: 27%; color: var(--chica-col); }
 
         .btn { 
             width: 50px; height: 50px; border-radius: 50%; border: 3px solid #000; 
@@ -194,16 +194,16 @@
             <button onclick="setMonitor(false)" style="position:absolute; bottom:5%; left:5%; width:60%; height:40px;">FECHAR MONITOR</button>
             <div id="map-container">
                 <div class="map-node active" id="m-1A" onclick="setCam('1A', 'Palco')">1A</div>
-                <div class="map-node" id="m-1B" onclick="setCam('1B', 'Jantar')">1B</div>
-                <div class="map-node" id="m-1C" onclick="setCam('1C', 'Cove')">1C</div>
-                <div class="map-node" id="m-5" onclick="setCam('5', 'Backstage')">5</div>
-                <div class="map-node" id="m-3" onclick="setCam('3', 'Suprimentos')">3</div>
+                <div class="map-node" id="m-1B" onclick="setCam('1B', 'Área de Jantar')">1B</div>
+                <div class="map-node" id="m-1C" onclick="setCam('1C', 'Caverna do Foxy')">1C</div>
+                <div class="map-node" id="m-5" onclick="setCam('5', 'Bastidores')">5</div>
+                <div class="map-node" id="m-3" onclick="setCam('3', 'Armazém')">3</div>
                 <div class="map-node" id="m-7" onclick="setCam('7', 'Banheiros')">7</div>
                 <div class="map-node" id="m-6" onclick="setCam('6', 'Cozinha')">6</div>
-                <div class="map-node" id="m-2A" onclick="setCam('2A', 'Corredor O.')">2A</div>
-                <div class="map-node" id="m-2B" onclick="setCam('2B', 'Canto O.')">2B</div>
-                <div class="map-node" id="m-4A" onclick="setCam('4A', 'Corredor L.')">4A</div>
-                <div class="map-node" id="m-4B" onclick="setCam('4B', 'Canto L.')">4B</div>
+                <div class="map-node" id="m-2A" onclick="setCam('2A', 'Corredor OESTE')">2A</div>
+                <div class="map-node" id="m-2B" onclick="setCam('2B', 'Canto OESTE')">2B</div>
+                <div class="map-node" id="m-4A" onclick="setCam('4A', 'Corredor LESTE')">4A</div>
+                <div class="map-node" id="m-4B" onclick="setCam('4B', 'Canto LESTE')">4B</div>
             </div>
         </div>
     </div>
@@ -244,11 +244,11 @@
     });
 
     const difficultyProfile = {
-        1: { freddy: 1, bonnie: 3, chica: 2, foxy: 1 },
-        2: { freddy: 2, bonnie: 5, chica: 4, foxy: 2 },
-        3: { freddy: 3, bonnie: 8, chica: 7, foxy: 4 },
-        4: { freddy: 6, bonnie: 12, chica: 10, foxy: 5 }, 
-        5: { freddy: 10, bonnie: 16, chica: 14, foxy: 7 } 
+        1: { freddy: 0, bonnie: 3, chica: 0, foxy: 5 },
+        2: { freddy: 0, bonnie: 5, chica: 5, foxy: 10 },
+        3: { freddy: 3, bonnie: 8, chica: 7, foxy: 15 },
+        4: { freddy: 6, bonnie: 12, chica: 10, foxy: 20 }, 
+        5: { freddy: 10, bonnie: 16, chica: 14, foxy: 25 } 
     };
 
     let gameState = {
